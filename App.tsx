@@ -81,7 +81,16 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, isSynthesizing: true }));
 
     const sourceContent = state.synthesized.content; 
-    const refined = await generateSynthesis(sourceContent, state.selectedFormat, state.targetLanguage, state.refinementRequest);
+    
+    // Pass full context: Source, Format, TargetLang, Request, Thesis, Antithesis
+    const refined = await generateSynthesis(
+      sourceContent, 
+      state.selectedFormat, 
+      state.targetLanguage, 
+      state.refinementRequest,
+      state.initial.content,   // Context: Thesis
+      state.improved.content   // Context: Antithesis
+    );
 
     setState(prev => ({
       ...prev,

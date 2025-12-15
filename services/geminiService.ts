@@ -54,7 +54,14 @@ ${thesis} (Refined)`;
   }
 };
 
-export const generateSynthesis = async (sourcePrompt: string, format: PromptFormat, targetLang: LanguageCode, refinement?: string): Promise<string> => {
+export const generateSynthesis = async (
+  sourcePrompt: string, 
+  format: PromptFormat, 
+  targetLang: LanguageCode, 
+  refinement?: string,
+  thesisContext?: string,
+  antithesisContext?: string
+): Promise<string> => {
   if (!sourcePrompt.trim()) return "";
 
   if (!ai) {
@@ -66,14 +73,54 @@ ${sourcePrompt}
 (Refinement applied: ${refinement || 'None'})`;
   }
 
-  const promptContent = refinement 
-    ? `Original Content: "${sourcePrompt}". 
-       Refinement Request: "${refinement}". 
-       Task: Refine the content based on the request, then format it strictly as ${format}.
-       IMPORTANT: The Final Output MUST be in the language: "${targetLang}".`
-    : `Content: "${sourcePrompt}". 
-       Task: Format this content strictly as ${format}.
-       IMPORTANT: The Final Output MUST be in the language: "${targetLang}".`;
+  // SPECIAL HANDLING FOR TYPESCRIPT
+  // Models often just output the type definition (string;) without the content.
+  // We force it to instantiate the object.
+  let specificFormatInstruction = `Format this content strictly as ${format}.`;
+  
+  if (format === PromptFormat.TYPESCRIPT) {
+    specificFormatInstruction = `
+      Format the content as a TypeScript Interface AND a constant object implementing that interface.
+      
+      CRITICAL REQUIREMENT: 
+      1. Define the Interface (e.g., interface PromptStructure { ... }).
+      2. IMMEDIATELY follow it with a 'const' variable (e.g., const prompt: PromptStructure = { ... }) that contains the ACTUAL CREATIVE CONTENT of the prompt.
+      3. Do NOT just write 'string' for the values. Fill the strings with the detailed prompt text.
+    `;
+  }
+
+  let promptContent = "";
+
+  if (refinement) {
+    // REFINEMENT MODE: Full Context
+    promptContent = `
+    ROLE: You are an expert system architect and prompt engineer.
+    TASK: Refine the "Current Draft" based on the "Refinement Request" and the "History of Evolution".
+
+    === HISTORY OF EVOLUTION ===
+    1. Thesis (Start): "${thesisContext || 'N/A'}"
+    2. Antithesis (Improved): "${antithesisContext || 'N/A'}"
+    
+    === CURRENT DRAFT (Synthesis) ===
+    "${sourcePrompt}"
+
+    === REFINEMENT REQUEST ===
+    "${refinement}"
+
+    === OUTPUT INSTRUCTION ===
+    1. Apply the refinement request to the Current Draft, keeping the context of the history in mind.
+    2. ${specificFormatInstruction}
+    3. The Final Output MUST be in the language: "${targetLang}".
+    4. Return ONLY the code/formatted text.
+    `;
+  } else {
+    // INITIAL SYNTHESIS MODE
+    promptContent = `
+    Content: "${sourcePrompt}". 
+    Task: ${specificFormatInstruction}
+    IMPORTANT: The Final Output MUST be in the language: "${targetLang}".
+    `;
+  }
 
   try {
     const response = await ai.models.generateContent({
