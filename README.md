@@ -1,39 +1,41 @@
-# Dialectical Prompt Synthesizer
 
-**A systematic interface for prompt engineering based on Hegelian dialectics: Thesis • Antithesis • Synthesis.**
+# Logic Lab: Structural Prompt Design
+
+**A professional workspace for high-quality prompt engineering based on iterative refinement: Concept • Analysis • Modular Synthesis.**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Tech](https://img.shields.io/badge/tech-React%20%7C%20TypeScript%20%7C%20Gemini-green)
 
 ---
 
-### 🌐 Languages / Языки
+### 🌐 Languages
 [**English**](README.md) | [Русский](readme/README_RU.md) | [Español](readme/README_ES.md) | [中文](readme/README_ZH.md) | [हिन्दी](readme/README_HI.md)
 
 ---
 
 ## 🧠 The Concept
 
-Most prompt engineering tools focus on "tricks". This tool focuses on **methodology**. It forces a dialectical process to refine ideas:
+Logic Lab is designed for professional prompt engineers who prioritize structure, logic, and efficiency. Instead of relying on random "hacks," Logic Lab utilizes a systemic iterative process to evolve your requirements:
 
-1.  **Thesis (Initial Prompt):** Your raw, imperfect idea.
-2.  **Antithesis (Dialectical Negation):** The AI critiques and negates the thesis, finding weaknesses and proposing a stronger, often more complex version.
-3.  **Synthesis (The Sublation):** You combine the best of both, applying a strict output format (XML, TypeScript, COSTAR, etc.) to create a final, production-ready prompt.
+1.  **Concept (Initial Draft):** Define your core objective and baseline requirements.
+2.  **Analysis (Review):** The AI analyst audits the concept for missing parameters, edge cases, and structural weaknesses, producing a robust analytical foundation.
+3.  **Synthesis (Modular Output):** Both inputs are integrated into a production-ready system prompt using strict schemas (XML, TypeScript, COSTAR, etc.).
 
 ## ⚡ Key Features
 
-*   **Multilingual Core:** Built-in translation for 5 languages (EN, RU, ES, ZH, HI).
-*   **Robust Translation Chain:** Uses a cascade of 6 services (Google Cloud -> Google GTX -> Lingva -> SimplyTranslate -> MyMemory -> LibreTranslate) before falling back to Gemini AI, ensuring zero-cost operation for most tasks.
-*   **Dual-View Interface:** Work in the target language (e.g., English for best AI results) while seeing the interface in your native language.
-*   **Persistence:** Export/Import full workspace states via JSON archives.
-*   **Gemini 2.5 Integration:** Uses the latest Google Gemini models for reasoning and synthesis.
+*   **Systemic Iteration:** Evolve prompts through automated critical review.
+*   **Modular Construction:** Drag-and-drop builder for structured prompt assets.
+*   **Global Localization:** Full support for 5 major languages with context-aware translation.
+*   **Reliable Translation Engine:** A fail-safe chain of 6 translation providers ensures continuous operation.
+*   **Export/Import:** Save and load full project archives in JSON format.
+*   **AI Logic:** Powered by Google Gemini 3 Pro models for advanced reasoning and synthesis.
 
-## 🛠️ Installation
+## 🛠️ Setup
 
-1.  **Clone the repository**
+1.  **Clone the project**
     ```bash
-    git clone https://github.com/your-username/dialectical-prompt-synthesizer.git
-    cd dialectical-prompt-synthesizer
+    git clone https://github.com/your-username/logic-lab.git
+    cd logic-lab
     ```
 
 2.  **Install dependencies**
@@ -41,28 +43,17 @@ Most prompt engineering tools focus on "tricks". This tool focuses on **methodol
     npm install
     ```
 
-3.  **Setup Environment**
+3.  **Configure API Access**
     *   Rename `env.example.txt` to `.env`.
-    *   Add your Gemini API Key (Get it from [Google AI Studio](https://aistudio.google.com/)).
+    *   Add your Gemini API Key.
     ```text
-    VITE_API_KEY=your_actual_api_key_here
+    VITE_API_KEY=your_key_here
     ```
 
-4.  **Run Development Server**
+4.  **Launch**
     ```bash
     npm run dev
     ```
-
-## 🏗️ Architecture
-
-*   **Frontend:** React 19 + TypeScript
-*   **Styling:** Tailwind CSS (Slate theme)
-*   **AI Logic:** @google/genai SDK (Gemini 2.5 Flash)
-*   **State Management:** Local React State + JSON Archiving
-
-## 🤝 Contributing
-
-We welcome contributions that improve the material basis of this tool. Fork, fix, and submit a PR.
 
 ## 📄 License
 

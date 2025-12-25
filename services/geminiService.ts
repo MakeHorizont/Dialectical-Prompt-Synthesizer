@@ -1,90 +1,62 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { PromptFormat, LanguageCode } from "../types";
 
-// Helper to check for API key without UI
-const getApiKey = (): string | undefined => {
-  // Accessing environment variable as per instructions
-  // In a Vite environment, this is typically import.meta.env.VITE_API_KEY
-  // or process.env.API_KEY depending on config. We check both.
-  // @ts-ignore
-  const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : (import.meta as any).env?.VITE_API_KEY;
-  return apiKey;
-};
+// Always use named parameter for apiKey and use process.env.API_KEY directly.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const apiKey = getApiKey();
-let ai: GoogleGenAI | null = null;
-
-if (apiKey) {
-  ai = new GoogleGenAI({ apiKey });
-}
-
-export const generateAntithesis = async (thesis: string, targetLang: LanguageCode): Promise<string> => {
-  if (!thesis.trim()) return "";
-
-  if (!ai) {
-    // Fallback/Simulation mode if no key is present
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return `[SIMULATED GEMINI OUTPUT - NO API KEY DETECTED]
-
-CRITIQUE:
-The initial prompt lacks specific context regarding the persona, constraints, and output format.
-
-IMPROVED PROMPT (${targetLang}):
-${thesis} (Refined)`;
-  }
+/**
+ * Generates an analytical review and improved version using systemic reasoning.
+ * Complex Text Task: Use gemini-3-pro-preview.
+ */
+export const generateAntithesis = async (concept: string, targetLang: LanguageCode): Promise<string> => {
+  if (!concept.trim()) return "";
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `You are a strict dialectical materialist and expert prompt engineer. 
-      Analyze the following prompt (Thesis). 
-      1. Identify its weaknesses.
-      2. Apply dialectical negation to create a stronger, more concrete version (Antithesis).
+      model: 'gemini-3-pro-preview',
+      contents: `You are a professional system analyst and expert prompt architect. 
+      Analyze the following prompt concept. 
+      1. Identify missing parameters, logical inconsistencies, and structural weaknesses.
+      2. Provide a significantly more detailed, robust, and structurally sound version that addresses all identified gaps.
       
-      The input might be in any language, but you MUST write the Output Improved Prompt in this language: "${targetLang}".
+      The input might be in any language, but you MUST write the Output Refined Prompt in this language: "${targetLang}".
 
-      Thesis: "${thesis}"
+      Concept: "${concept}"
       
-      Return ONLY the improved Antithesis prompt text in ${targetLang}. Do not include your reasoning.`,
+      Return ONLY the refined prompt text in ${targetLang}. Do not include your reasoning or meta-talk.`,
     });
-    return response.text || "Error generating response.";
+    return response.text || "Error generating analytical review.";
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Error contacting intelligence source.";
   }
 };
 
+/**
+ * Integrates initial and refined versions into a structured systemic prompt.
+ * Complex Text Task: Use gemini-3-pro-preview.
+ */
 export const generateSynthesis = async (
   sourcePrompt: string, 
   format: PromptFormat, 
   targetLang: LanguageCode, 
   refinement?: string,
-  thesisContext?: string,
-  antithesisContext?: string
+  initialContext?: string,
+  analysisContext?: string
 ): Promise<string> => {
   if (!sourcePrompt.trim()) return "";
 
-  if (!ai) {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return `[SIMULATED SYNTHESIS - ${format}]
-    
-${sourcePrompt}
-
-(Refinement applied: ${refinement || 'None'})`;
-  }
-
-  // SPECIAL HANDLING FOR TYPESCRIPT
-  // Models often just output the type definition (string;) without the content.
-  // We force it to instantiate the object.
+  // Formatting instructions based on format parameter
   let specificFormatInstruction = `Format this content strictly as ${format}.`;
   
   if (format === PromptFormat.TYPESCRIPT) {
     specificFormatInstruction = `
-      Format the content as a TypeScript Interface AND a constant object implementing that interface.
+      Format the content as a TypeScript Module containing an interface AND a constant object implementing that interface.
       
       CRITICAL REQUIREMENT: 
-      1. Define the Interface (e.g., interface PromptStructure { ... }).
-      2. IMMEDIATELY follow it with a 'const' variable (e.g., const prompt: PromptStructure = { ... }) that contains the ACTUAL CREATIVE CONTENT of the prompt.
+      1. Define the Interface (e.g., interface PromptSystem { ... }).
+      2. IMMEDIATELY follow it with a 'const' variable (e.g., const systemConfig: PromptSystem = { ... }) that contains the ACTUAL CREATIVE CONTENT of the prompt.
       3. Do NOT just write 'string' for the values. Fill the strings with the detailed prompt text.
     `;
   }
@@ -92,29 +64,29 @@ ${sourcePrompt}
   let promptContent = "";
 
   if (refinement) {
-    // REFINEMENT MODE: Full Context
+    // OPTIMIZATION MODE
     promptContent = `
-    ROLE: You are an expert system architect and prompt engineer.
-    TASK: Refine the "Current Draft" based on the "Refinement Request" and the "History of Evolution".
+    ROLE: You are an expert system architect and infrastructure engineer.
+    TASK: Optimize the "Current Draft" based on the "Update Request" and the "Project History".
 
-    === HISTORY OF EVOLUTION ===
-    1. Thesis (Start): "${thesisContext || 'N/A'}"
-    2. Antithesis (Improved): "${antithesisContext || 'N/A'}"
+    === PROJECT HISTORY ===
+    1. Initial Concept: "${initialContext || 'N/A'}"
+    2. Analytical Review: "${analysisContext || 'N/A'}"
     
-    === CURRENT DRAFT (Synthesis) ===
+    === CURRENT DRAFT ===
     "${sourcePrompt}"
 
-    === REFINEMENT REQUEST ===
+    === UPDATE REQUEST ===
     "${refinement}"
 
     === OUTPUT INSTRUCTION ===
-    1. Apply the refinement request to the Current Draft, keeping the context of the history in mind.
+    1. Apply the update request to the Current Draft, ensuring all structural improvements from history are preserved.
     2. ${specificFormatInstruction}
     3. The Final Output MUST be in the language: "${targetLang}".
     4. Return ONLY the code/formatted text.
     `;
   } else {
-    // INITIAL SYNTHESIS MODE
+    // INITIAL SYSTEMIC INTEGRATION
     promptContent = `
     Content: "${sourcePrompt}". 
     Task: ${specificFormatInstruction}
@@ -124,26 +96,29 @@ ${sourcePrompt}
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       contents: promptContent,
     });
-    return response.text || "Error generating synthesis.";
+    return response.text || "Error generating systemic prompt.";
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Error synthesizing prompt.";
   }
 };
 
+/**
+ * Fallback translation using Gemini for high-quality semantic accuracy.
+ * Basic Text Task: Use gemini-3-flash-preview.
+ */
 export const translateWithGemini = async (text: string, targetLang: string): Promise<string | null> => {
-    if (!ai || !text.trim()) return null;
+    if (!text.trim()) return null;
     
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3-flash-preview',
             contents: `Translate the following text strictly into ${targetLang}. Return ONLY the translated text, no explanations, no wrappers, no markdown. Text: "${text}"`
         });
         const result = response.text?.trim();
-        // Check if result looks like an error or is empty
         if (!result || result.startsWith("Error")) return null;
         return result;
     } catch (e) {

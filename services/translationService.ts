@@ -1,10 +1,8 @@
 import { translateWithGemini } from "./geminiService";
 
-// Helper to check for API key
+// Helper to check for API key exclusively from environment
 const getApiKey = (): string | undefined => {
-  // @ts-ignore
-  const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : (import.meta as any).env?.VITE_API_KEY;
-  return apiKey;
+  return process.env.API_KEY;
 };
 
 const apiKey = getApiKey();
@@ -121,7 +119,6 @@ export const translateText = async (text: string, targetLang: string, sourceLang
   ];
 
   for (const provider of providers) {
-      // console.log(`Trying translation provider: ${provider.name}...`); // Debugging
       const result = await provider.fn(text, targetLang, sourceLang);
       if (result) {
           return result;
